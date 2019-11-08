@@ -19,6 +19,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/AliyunContainerService/kube-eventer/filters"
 	"net"
 	"net/http"
 	"os"
@@ -40,6 +41,7 @@ var (
 	argFrequency   = flag.Duration("frequency", 30*time.Second, "The resolution at which Eventer pushes events to sinks")
 	argMaxProcs    = flag.Int("max_procs", 0, "max number of CPUs that can be used simultaneously. Less than 1 for default (number of cores)")
 	argSources     flags.Uris
+	argFilters     flags.Uris
 	argSinks       flags.Uris
 	argVersion     bool
 	argHealthzIP   = flag.String("healthz-ip", "0.0.0.0", "ip eventer health check service uses")
@@ -53,6 +55,7 @@ func main() {
 	defer klog.Flush()
 
 	flag.Var(&argSources, "source", "source(s) to read events from")
+	flag.Var(&argFilters, "filter", "filter(s) events")
 	flag.Var(&argSinks, "sink", "external sink(s) that receive events")
 	flag.BoolVar(&argVersion, "version", false, "print version info and exit")
 	flag.Parse()
@@ -81,6 +84,13 @@ func main() {
 	}
 	if len(sources) != 1 {
 		klog.Fatal("Requires exactly 1 source")
+	}
+
+	// filters
+	filtersFactory := filters.NewFilterFactory()
+	filterList := filtersFactory.BuildAll(argFilters)
+	if len([]flags.Uri(argFilters)) != 0 && len(filterList) == 0 {
+		klog.Info("No filter declared")
 	}
 
 	// sinks

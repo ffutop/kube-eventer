@@ -34,6 +34,12 @@ type EventSource interface {
 	GetNewEvents() *EventBatch
 }
 
+type EventFilter interface {
+	Filter(batch *EventBatch) *EventBatch
+
+	NextFilter() *EventFilter
+}
+
 type EventSink interface {
 	Name() string
 
