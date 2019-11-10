@@ -93,6 +93,14 @@ func main() {
 		klog.Info("No filter declared")
 	}
 
+	for _, filter := range filterList {
+		klog.Infof("Load %s filter", filter.Name())
+	}
+	filterManager, err := filters.NewFilterManager(filterList)
+	if err != nil {
+		klog.Fatal("Failed to create filter manager: %v", err)
+	}
+
 	// sinks
 	sinksFactory := sinks.NewSinkFactory()
 	sinkList := sinksFactory.BuildAll(argSinks)
@@ -109,7 +117,7 @@ func main() {
 	}
 
 	// main manager
-	manager, err := manager.NewManager(sources[0], sinkManager, *argFrequency)
+	manager, err := manager.NewManager(sources[0], filterManager, sinkManager, *argFrequency)
 	if err != nil {
 		klog.Fatalf("Failed to create main manager: %v", err)
 	}

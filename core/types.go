@@ -35,9 +35,10 @@ type EventSource interface {
 }
 
 type EventFilter interface {
-	Filter(batch *EventBatch) *EventBatch
+	Name() string
 
-	NextFilter() *EventFilter
+	// execute filter logical, remove unsatisfied Events, and repackage event batch.
+	Filter(batch *EventBatch) *EventBatch
 }
 
 type EventSink interface {

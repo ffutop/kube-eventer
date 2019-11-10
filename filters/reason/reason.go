@@ -48,6 +48,10 @@ func CreateReasonFilter(url *url.URL) (*ReasonFilter, error) {
 	return rf, nil
 }
 
+func (filter *ReasonFilter) Name() string {
+	return "ReasonFilter"
+}
+
 func (filter *ReasonFilter) Filter(batch *core.EventBatch) *core.EventBatch {
 	// only one list (includes / excludes) will work
 	newEvents := make([]*kube_api.Event, len(batch.Events))
